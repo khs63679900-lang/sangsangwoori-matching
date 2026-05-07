@@ -5,23 +5,25 @@ import Link from 'next/link'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
-type Props = { searchParams: Promise<{ senior_id?: string }> }
+type Props = { searchParams: Promise<{ senior_id?: string; registered?: string }> }
 
 function ScoreBadge({ score }: { score: number }) {
   const color =
     score >= 80 ? 'bg-green-600' :
     score >= 50 ? 'bg-yellow-500' : 'bg-gray-400'
   return (
-    <span className={`${color} text-white text-lg font-bold px-4 py-1 rounded-full`}>
+    <span
+      data-testid="score-badge"
+      className={`${color} text-white text-lg font-bold px-4 py-1 rounded-full`}
+    >
       {score}점
     </span>
   )
 }
 
 export default async function RecommendationsPage({ searchParams }: Props) {
-  const { senior_id } = await searchParams
+  const { senior_id, registered } = await searchParams
 
-  // senior_id 없으면 안내 메시지
   if (!senior_id) {
     return (
       <div className="text-center py-20">
@@ -38,7 +40,6 @@ export default async function RecommendationsPage({ searchParams }: Props) {
     )
   }
 
-  // 시니어 정보 + 매칭 결과(점수순) 조회
   const [{ data: senior }, { data: matches }] = await Promise.all([
     supabase.from('seniors').select('*').eq('id', senior_id).single(),
     supabase
@@ -52,16 +53,25 @@ export default async function RecommendationsPage({ searchParams }: Props) {
     <div>
       <h1 className="text-4xl font-bold text-blue-700 mb-1">추천 일자리</h1>
       {senior && (
-        <p className="text-xl text-gray-600 mb-8">
+        <p className="text-xl text-gray-600 mb-4">
           <span className="font-semibold">{senior.name}</span>님의 매칭 결과입니다
           &nbsp;·&nbsp; 지역: {senior.region}
           &nbsp;·&nbsp; 희망직종: {senior.desired_job}
         </p>
       )}
 
+      {registered === 'true' && (
+        <div
+          data-testid="success-message"
+          className="mb-6 bg-green-50 border border-green-400 rounded-lg p-4 text-green-700 text-lg font-semibold"
+        >
+          등록이 완료되었습니다
+        </div>
+      )}
+
       {(!matches || matches.length === 0) ? (
-        <div className="text-center py-20 text-gray-500">
-          <p className="text-2xl">현재 매칭 가능한 일자리가 없습니다.</p>
+        <div data-testid="no-match" className="text-center py-20 text-gray-500">
+          <p className="text-2xl">현재 매칭되는 일자리가 없습니다.</p>
           <p className="text-xl mt-2">지역·직종 조건이 맞는 공고가 등록되면 자동으로 추천됩니다.</p>
         </div>
       ) : (
@@ -69,7 +79,11 @@ export default async function RecommendationsPage({ searchParams }: Props) {
           {matches.map((m) => {
             const job = m.jobs as { title: string; region: string; job_type: string; required_career: number }
             return (
-              <Card key={m.id} className="shadow-md border border-gray-200 hover:shadow-lg transition-shadow">
+              <Card
+                key={m.id}
+                data-testid="match-card"
+                className="shadow-md border border-gray-200 hover:shadow-lg transition-shadow"
+              >
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-2xl text-gray-900">{job.title}</CardTitle>
                   <ScoreBadge score={m.score} />

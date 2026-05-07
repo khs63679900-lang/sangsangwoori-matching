@@ -1,16 +1,21 @@
+'use client'
+
+import { useActionState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { registerSenior } from '@/app/actions'
 
 const fields = [
-  { id: 'name',        label: '이름',       type: 'text',   placeholder: '홍길동',              required: true  },
-  { id: 'region',      label: '지역',       type: 'text',   placeholder: '서울, 부산, 대구 등', required: true  },
-  { id: 'desired_job', label: '희망 직종',  type: 'text',   placeholder: '경비, 청소, 사무보조 등', required: true },
-  { id: 'career_years',label: '경력 (년)',  type: 'number', placeholder: '예: 10',              required: false },
+  { id: 'name',         label: '이름',      type: 'text',   placeholder: '홍길동',                  required: true  },
+  { id: 'region',       label: '지역',      type: 'text',   placeholder: '서울, 부산, 대구 등',      required: true  },
+  { id: 'desired_job',  label: '희망 직종', type: 'text',   placeholder: '경비, 청소, 사무보조 등',  required: true  },
+  { id: 'career_years', label: '경력 (년)', type: 'number', placeholder: '예: 10',                  required: false },
 ]
 
 export default function RegisterPage() {
+  const [state, action] = useActionState(registerSenior, null)
+
   return (
     <div className="max-w-2xl mx-auto">
       <h1 className="text-4xl font-bold text-blue-700 mb-2">프로필 등록</h1>
@@ -24,7 +29,16 @@ export default function RegisterPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form action={registerSenior} className="flex flex-col gap-6">
+          {state?.error && (
+            <div
+              role="alert"
+              data-testid="error-message"
+              className="mb-4 bg-red-50 border border-red-400 rounded-lg p-4 text-red-700 text-lg"
+            >
+              {state.error}
+            </div>
+          )}
+          <form action={action} className="flex flex-col gap-6">
             {fields.map(({ id, label, type, placeholder, required }) => (
               <div key={id} className="flex flex-col gap-2">
                 <label htmlFor={id} className="text-xl font-semibold text-gray-800">
@@ -35,7 +49,6 @@ export default function RegisterPage() {
                   name={id}
                   type={type}
                   placeholder={placeholder}
-                  required={required}
                   min={type === 'number' ? 0 : undefined}
                   className="text-xl h-14 px-4 border-2 border-gray-300 focus:border-blue-600"
                 />
