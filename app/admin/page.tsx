@@ -3,6 +3,10 @@ export const dynamic = 'force-dynamic'
 import { supabase } from '@/lib/supabase'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import Link from 'next/link'
+import { AlertTriangle, Clock, CheckCircle } from 'lucide-react'
 import { AssignButton } from './AssignButton'
 
 // 시니어별 최고 점수 매칭 1건을 대표로 사용
@@ -55,6 +59,7 @@ export default async function AdminPage() {
           label="미매칭"
           count={unmatched.length}
           badgeClass="bg-red-100 text-red-700 border-red-300"
+          icon={<AlertTriangle className="w-6 h-6 text-red-500" />}
           empty={unmatched.length === 0}
         >
           {unmatched.map(s => (
@@ -62,9 +67,15 @@ export default async function AdminPage() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-xl">{s.name}</CardTitle>
               </CardHeader>
-              <CardContent className="pt-0 text-lg text-gray-600 flex flex-col gap-1">
+              <CardContent className="pt-0 text-lg text-gray-600 flex flex-col gap-2">
                 <p>지역: {s.region}</p>
                 <p>희망 직종: {s.desired_job}</p>
+                <Link
+                  href={`/recommendations?senior_id=${s.id}`}
+                  className={cn(buttonVariants({ variant: 'outline', size: 'default' }), 'mt-1 text-base min-h-[48px]')}
+                >
+                  상세 보기
+                </Link>
               </CardContent>
             </Card>
           ))}
@@ -75,6 +86,7 @@ export default async function AdminPage() {
           label="매칭 대기"
           count={pending.length}
           badgeClass="bg-yellow-100 text-yellow-700 border-yellow-300"
+          icon={<Clock className="w-6 h-6 text-yellow-500" />}
           empty={pending.length === 0}
         >
           {pending.map(({ senior, topMatch }) => {
@@ -88,6 +100,12 @@ export default async function AdminPage() {
                   <p>지역: {senior.region}</p>
                   <p>추천: {job.title} ({topMatch.score}점)</p>
                   <AssignButton matchId={topMatch.id} />
+                  <Link
+                    href={`/recommendations?senior_id=${senior.id}`}
+                    className={cn(buttonVariants({ variant: 'outline', size: 'default' }), 'text-base min-h-[48px]')}
+                  >
+                    상세 보기
+                  </Link>
                 </CardContent>
               </Card>
             )
@@ -99,6 +117,7 @@ export default async function AdminPage() {
           label="배정 완료"
           count={assigned.length}
           badgeClass="bg-green-100 text-green-700 border-green-300"
+          icon={<CheckCircle className="w-6 h-6 text-green-600" />}
           empty={assigned.length === 0}
         >
           {assigned.map(({ senior, topMatch }) => {
@@ -108,9 +127,15 @@ export default async function AdminPage() {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-xl">{senior.name}</CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0 text-lg text-gray-600 flex flex-col gap-1">
+                <CardContent className="pt-0 text-lg text-gray-600 flex flex-col gap-2">
                   <p>지역: {senior.region}</p>
                   <p>배정: {job.title}</p>
+                  <Link
+                    href={`/recommendations?senior_id=${senior.id}`}
+                    className={cn(buttonVariants({ variant: 'outline', size: 'default' }), 'text-base min-h-[48px]')}
+                  >
+                    상세 보기
+                  </Link>
                 </CardContent>
               </Card>
             )
@@ -123,17 +148,19 @@ export default async function AdminPage() {
 }
 
 function Column({
-  label, count, badgeClass, empty, children,
+  label, count, badgeClass, icon, empty, children,
 }: {
   label: string
   count: number
   badgeClass: string
+  icon: React.ReactNode
   empty: boolean
   children: React.ReactNode
 }) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-3">
+        {icon}
         <h2 className="text-2xl font-bold text-gray-800">{label}</h2>
         <Badge variant="outline" className={`text-lg px-3 py-1 ${badgeClass}`}>
           {count}명

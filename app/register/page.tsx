@@ -7,10 +7,10 @@ import { Button } from '@/components/ui/button'
 import { registerSenior } from '@/app/actions'
 
 const fields = [
-  { id: 'name',         label: '이름',      type: 'text',   placeholder: '홍길동',                  required: true  },
-  { id: 'region',       label: '지역',      type: 'text',   placeholder: '서울, 부산, 대구 등',      required: true  },
-  { id: 'desired_job',  label: '희망 직종', type: 'text',   placeholder: '경비, 청소, 사무보조 등',  required: true  },
-  { id: 'career_years', label: '경력 (년)', type: 'number', placeholder: '예: 10',                  required: false },
+  { id: 'name',         label: '이름',      hint: '성함이 어떻게 되세요?',          type: 'text',   placeholder: '홍길동',                  required: true  },
+  { id: 'region',       label: '지역',      hint: '어디에서 일하고 싶으세요?',       type: 'text',   placeholder: '서울, 부산, 대구 등',      required: true  },
+  { id: 'desired_job',  label: '희망 직종', hint: '어떤 일을 하시겠어요?',           type: 'text',   placeholder: '경비, 청소, 사무보조 등',  required: true  },
+  { id: 'career_years', label: '경력 (년)', hint: '경력은 몇 년이나 되세요?',        type: 'number', placeholder: '예: 10',                  required: false },
 ]
 
 export default function RegisterPage() {
@@ -18,7 +18,7 @@ export default function RegisterPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h1 className="text-4xl font-bold text-blue-700 mb-2">프로필 등록</h1>
+      <h1 className="text-4xl font-bold text-blue-700 mb-2">시니어 일자리 신청하기</h1>
       <p className="text-xl text-gray-600 mb-8">정보를 입력하시면 맞는 일자리를 찾아드립니다.</p>
 
       <Card className="shadow-lg border border-gray-200">
@@ -39,8 +39,9 @@ export default function RegisterPage() {
             </div>
           )}
           <form action={action} className="flex flex-col gap-6">
-            {fields.map(({ id, label, type, placeholder, required }) => (
+            {fields.map(({ id, label, hint, type, placeholder, required }) => (
               <div key={id} className="flex flex-col gap-2">
+                <p className="text-lg text-blue-700 font-medium">{hint}</p>
                 <label htmlFor={id} className="text-xl font-semibold text-gray-800">
                   {label}{required && ' *'}
                 </label>

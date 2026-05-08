@@ -11,12 +11,18 @@ function ScoreBadge({ score }: { score: number }) {
   const color =
     score >= 80 ? 'bg-green-600' :
     score >= 50 ? 'bg-yellow-500' : 'bg-gray-400'
+  const label =
+    score >= 80 ? '매우 적합' :
+    score >= 50 ? '적합' : '보통'
   return (
-    <span
-      data-testid="score-badge"
-      className={`${color} text-white text-lg font-bold px-4 py-1 rounded-full`}
-    >
-      {score}점
+    <span className="flex items-center gap-2">
+      <span
+        data-testid="score-badge"
+        className={`${color} text-white text-lg font-bold px-4 py-1 rounded-full`}
+      >
+        {score}점
+      </span>
+      <span className="text-base font-semibold text-gray-600">{label}</span>
     </span>
   )
 }
@@ -51,11 +57,12 @@ export default async function RecommendationsPage({ searchParams }: Props) {
 
   return (
     <div>
-      <h1 className="text-4xl font-bold text-blue-700 mb-1">추천 일자리</h1>
+      <h1 className="text-4xl font-bold text-blue-700 mb-1">
+        {senior ? `${senior.name} 님께 맞는 일자리` : '추천 일자리'}
+      </h1>
       {senior && (
         <p className="text-xl text-gray-600 mb-4">
-          <span className="font-semibold">{senior.name}</span>님의 매칭 결과입니다
-          &nbsp;·&nbsp; 지역: {senior.region}
+          지역: {senior.region}
           &nbsp;·&nbsp; 희망직종: {senior.desired_job}
         </p>
       )}
@@ -65,14 +72,18 @@ export default async function RecommendationsPage({ searchParams }: Props) {
           data-testid="success-message"
           className="mb-6 bg-green-50 border border-green-400 rounded-lg p-4 text-green-700 text-lg font-semibold"
         >
-          등록이 완료되었습니다
+          등록이 완료되었습니다. 담당자가 곧 연락드립니다.
         </div>
       )}
 
       {(!matches || matches.length === 0) ? (
-        <div data-testid="no-match" className="text-center py-20 text-gray-500">
-          <p className="text-2xl">현재 매칭되는 일자리가 없습니다.</p>
-          <p className="text-xl mt-2">지역·직종 조건이 맞는 공고가 등록되면 자동으로 추천됩니다.</p>
+        <div
+          data-testid="no-match"
+          className="mt-6 bg-yellow-50 border border-yellow-300 rounded-lg p-6 text-gray-700"
+        >
+          <p className="text-2xl font-semibold mb-2">현재 매칭되는 일자리가 없습니다.</p>
+          <p className="text-xl text-gray-600">지역·직종 조건이 맞는 공고가 등록되면 자동으로 추천됩니다.</p>
+          <p className="text-xl text-gray-600 mt-1">담당자가 직접 연락드리니 잠시만 기다려 주세요.</p>
         </div>
       ) : (
         <div className="flex flex-col gap-6">
